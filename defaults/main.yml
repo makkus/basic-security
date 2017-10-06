@@ -1,2 +1,9 @@
 ---
 # defaults file for basic-security
+
+# not a default, but can be set externally
+# basic_security_root_pw = 'secure password'
+# basic_security_user_name = 'admin'
+# basic_security_user_pw = 'secure password'
+basic_security_user_shell = '/bin/bash'
+basic_security_user_public_keys = []

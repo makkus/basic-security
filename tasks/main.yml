@@ -1,2 +1,43 @@
 ---
 # tasks file for basic-security
+- name: root password
+  user:
+    name: root
+    password: "{{ basic_security_root_pw }}"
+  when: basic_security_root_pw
+
+- name: install default shell for admin user
+  install:
+    packages:
+      - "{{ basic_security_user_shell.split('/')[-1] }}"
+    pkg_mgr: "auto"
+  when: basic_security_user_name and basic_security_user_pw
+
+- name: add admin user
+  user:
+    name: "{{ basic_security_user_name }}"
+    password: "{{ basic_security_user_pw }}"
+    shell: "{{ basic_security_user_shell }}"
+  when: basic_security_user_name and basic_security_user_pw
+
+- name: add authorized_keys for admin user
+  authorized_key:
+    user: "{{ basic_security_user_name }}"
+    key: "{{ item }}"
+  with_items:
+    - "{{ basic_security_user_public_keys }}"
+  when: basic_security_user_name and basic_security_user_pw and basic_security_user_public_keys
+
+- name: install sudo
+  install:
+    packages:
+      - sudo
+  when: basic_security_user_name and basic_security_user_pw
+
+- name: add admin user to sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: "{{ basic_security_user_name }} ALL"
+    line: "{{ basic_security_user_name }} ALL=(ALL) ALL"
+    state: present
+  when: basic_security_user_name and basic_security_user_pw
