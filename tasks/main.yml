@@ -75,10 +75,12 @@
 
 - name: Install yum-cron.
   yum: name=yum-cron state=present
+  become: true
   when: ansible_os_family == 'RedHat' and basic_security_autoupdate_enabled
 
 - name: Ensure yum-cron is running and enabled on boot.
   service: name=yum-cron state=started enabled=yes
+  become: true
   when: ansible_os_family == 'RedHat' and basic_security_autoupdate_enabled
 
 - name: Configure autoupdates (RHEL 7).
@@ -86,6 +88,7 @@
     dest: "/etc/yum/yum-cron.conf"
     regexp: '^apply_updates = .+'
     line: 'apply_updates = yes'
+  become: true
   when: ansible_os_family == 'RedHat' and basic_security_autoupdate_enabled and ansible_distribution_major_version | int == 7
 
 
@@ -98,6 +101,7 @@
     owner: root
     group: root
     mode: 0644
+  become: true
   with_items:
     - 10periodic
     # - 50unattended-upgrades
